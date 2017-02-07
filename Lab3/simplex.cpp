@@ -46,12 +46,12 @@ void print(int n, int m, float **A)
 void simplex(float **activeA, int n, int m, int *index)
 {
 	float lastrow[n+1], *temp;
-	int i, j, pivot_col=0, pivot_row;
-	bool stop=true;
+	int i, j, pivot_col=0, pivot_row, count;
+	bool stop=true, unbounded=false;
 
 	for (i=0; i<n; i++)
 	{
-		if (activeA[m][i]<0)
+		if (activeA[m][i]<=0)
 			stop=false;
 
 	}
@@ -74,6 +74,38 @@ void simplex(float **activeA, int n, int m, int *index)
 
 	pivot_col=min_index(activeA[m], n+1);
 
+	//If the last element corresponding to pivot choosen pivot col is zero, Alternate solution exists.
+	if (activeA[m][pivot_col]==0)
+	{
+		cout<<endl<<"Alternate Solution Exists. Optimal Solution is "<<activeA[m][n]<<endl;
+		float *sol_;
+		sol_ = new float [m];
+		for (i=0; i<m; i++)
+		{
+			if (index[i]>=0)
+				sol_[index[i]]=activeA[i][n];
+		}
+		for (i=0; i<m; i++)
+		{
+			cout<<"x"<<i+1<<" is "<<sol_[i]<<endl;
+		}
+		return;
+	}
+
+
+	//Unboundedness Checking
+	count=0;
+	for (i=0; i<m; i++)
+	{
+		if (activeA[i][pivot_col]<=0)
+			count++;
+	}
+	if (count==m){
+		cout<<"Solution is Unbounded"<<endl;
+		return;
+	}
+
+	//creating temp array for choosing pivot_row
 	temp=new float [m];
 	for (i=0; i<m; i++)
 	{
@@ -83,7 +115,7 @@ void simplex(float **activeA, int n, int m, int *index)
 			temp[i]=1000000;
 	}
 	pivot_row=min_col_index(temp, m);
-	cout<<pivot_row<<"  "<<pivot_col<<endl;
+	cout<<"Row Column"<<pivot_row<<"  "<<pivot_col<<endl;
 
 	index[pivot_row]=pivot_col;
 
@@ -107,7 +139,7 @@ void simplex(float **activeA, int n, int m, int *index)
 		activeA[i][pivot_col]=-activeA[i][pivot_col]/pivot;
 	activeA[pivot_row][pivot_col]=1/pivot;
 	
-	// print(n+1, m+1, activeA);
+	print(n+1, m+1, activeA);
 
 
 	simplex(activeA, n, m, index);

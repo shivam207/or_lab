@@ -1,0 +1,13 @@
+package AkhilRaj;
+
+public class BSTex extends BST{
+	
+	public static void main(String[] args) {
+		
+		
+
+	}
+	
+	
+
+}

@@ -1,0 +1,4 @@
+INDEX VERSION 1.126+/user/user/Desktop/stw-lab/.metadata/.plugins/org.eclipse.jdt.core
+1256105736.index
+3499784249.index
+1292001176.index

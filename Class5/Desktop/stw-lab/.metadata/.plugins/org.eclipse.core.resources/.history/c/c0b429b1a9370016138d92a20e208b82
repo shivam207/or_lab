@@ -1,0 +1,23 @@
+package AkhilRaj;
+
+public class CaesarCipher implements Cipher{
+
+	private int noOfPositions;
+	
+	public CaesarCipher(int numberOfPositions)
+	{
+		
+		this.noOfPositions = noOfPositions;
+		
+	}
+	
+	
+	
+	
+	interface Cipher
+	{
+		public String encrypt(String plaintext);
+		public String decrypt(String ciphertext);
+	}
+
+}

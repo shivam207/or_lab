@@ -1,0 +1,49 @@
+package lab7;
+
+import java.util.Scanner;
+public class BSTex<T extends Comparable<T>>extends BST<T>{
+	
+	
+	void FindParent(Node<T> node,T x){
+		if(node!=null)
+		{if((node.left!=null)&&(node.left.data==x))
+			System.out.println(node.data);
+		if((node.right!=null)&&(node.right.data==x))
+			System.out.println(node.data);
+		 FindParent(node.left,x);
+		FindParent(node.right,x);
+		}
+		}
+	void max(Node N){
+		 int maxm= (int) N.data;
+		 if(N!=null){
+			         
+				{if((N.left!=null)&&((int)(N.left.data)>maxm))
+					maxm=(int) N.left.data;
+				if((N.right!=null)&&((int)(N.right.data)>maxm))
+					maxm=(int) N.right.data;
+				}
+				max(N.left);
+				max(N.right);
+				
+		 }	System.out.println(maxm);
+		 
+	}
+
+
+	public static void main(String[] args){
+		Scanner reader=new Scanner(System.in);
+		BSTex<Integer> b=new BSTex<Integer>();
+		int[] a = {1,5,2,7,4,67,12};
+		for(int n : a) b.insert(n);
+		System.out.println(b );
+		System.out.println("enter number");
+Integer n=reader.nextInt();
+b.FindParent(b.root, n);
+System.out.println("maximum=");
+b.max(b.root);
+
+
+
+	}
+}

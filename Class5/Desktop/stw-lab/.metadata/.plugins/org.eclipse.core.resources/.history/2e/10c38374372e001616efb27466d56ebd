@@ -1,0 +1,40 @@
+package lab7;
+
+import java.util.Scanner;
+java.util.Scanner;
+public class BSTex<T extends Comparable<T>>extends BST<T>{
+	
+	
+	T FindParent(Node node,T x){
+		T a;
+		T b;
+
+		if(node!=null)
+		{if((node.left!=null)&&(node.left.data==x))
+			return  (T) node.data;
+		if((node.right!=null)&&(node.right.data==x))
+			return  (T) node.data;
+		a= FindParent(node.left,x);
+		b=FindParent(node.left,x);
+		if(a!=null)
+			return a;
+		else
+			return b;
+		}
+		else return null;
+
+	}
+
+
+	public static void main(String[] args){
+		Scanner reader=new Scanner(System.in);
+		BSTex<Integer> b=new BSTex<Integer>();
+		int[] a = {1,5,2,7,4,67,12};
+		for(int n : a) b.insert(n);
+		System.out.println(b);
+		System.out.println("enter the number whose parent is to be found");
+		Integer n=reader.nextInt();
+		System.out.println( b.FindParent(b.root,n));
+
+	}
+}
