@@ -72,7 +72,7 @@ void simplex(float **activeA, int n, int m, int *index)
 		return;
 	}
 
-	pivot_col=min_index(activeA[m], n+1);
+	pivot_col=min_index(activeA[m], n);
 
 	//If the last element corresponding to pivot choosen pivot col is zero, Alternate solution exists.
 	if (activeA[m][pivot_col]==0)
@@ -149,7 +149,7 @@ void simplex(float **activeA, int n, int m, int *index)
 
 int main()
 {
-	int n, m, i, j, *sol_index, geq, leq, eq, M=100000;
+	int n, m, i, j, *sol_index, geq, leq, eq, M=1000;
 	float **A, *b, **activeA, *z, temp;
 
 	cout<<"Enter No of Equations : ";
@@ -210,7 +210,6 @@ int main()
 			temp=temp+A[j][i];
 		activeA[m][i]=-z[i]-temp*M;
 	}
-
 
 
 	print(n+geq+1, m+1, activeA);

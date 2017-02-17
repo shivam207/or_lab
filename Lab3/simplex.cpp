@@ -184,12 +184,13 @@ int main()
 		activeA[i][n]=b[i];
 	}
 
-	cout<<"Enter the objective function z :\n";
+	cout<<"Enter the objective function z (with the constant term) :\n";
 	z=new float [n];
 	for (i=0; i<n; i++){
 		cin>>z[i];
 		activeA[m][i]=-z[i];
 	}
+	cin>>activeA[m][n];
 
 
 	print(n+1, m+1, activeA);
