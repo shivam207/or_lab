@@ -1,10 +1,12 @@
-//				Lab3 Code
+//				Lab3 Question
 
 #include <iostream>
 #include <iomanip> 
 #include <vector>
 
 using namespace std;
+
+int checkSolution;
 
 int min_index(float *lastrow, int length)
 {
@@ -57,22 +59,7 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 	}
 
 	if (stop==true){
-		if (max_min==1)
-			cout<<endl<<"Optimal Solution is "<<activeA[m][n]<<endl;
-		if (max_min==2)
-			cout<<endl<<"Optimal Solution is "<<(-1)*activeA[m][n]<<endl;
-		
-		float *sol_;
-		sol_ = new float [m];
-		for (i=0; i<m; i++)
-		{
-			if (index[i]>=0)
-				sol_[index[i]]=activeA[i][n];
-		}
-		for (i=0; i<m; i++)
-		{
-			cout<<"x"<<i+1<<" is "<<sol_[i]<<endl;
-		}
+		checkSolution=1; // Solution exists
 		return;
 	}
 
@@ -81,21 +68,7 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 	//If the last element corresponding to pivot choosen pivot col is zero, Alternate solution exists.
 	if (activeA[m][pivot_col]==0)
 	{
-		if (max_min==1)
-			cout<<endl<<"Alternate Solution Exists. Optimal Solution is "<<activeA[m][n]<<endl;
-		if (max_min==2)
-			cout<<endl<<"Alternate Solution Exists. Optimal Solution is "<<(-1)*activeA[m][n]<<endl;
-		float *sol_;
-		sol_ = new float [m];
-		for (i=0; i<m; i++)
-		{
-			if (index[i]>=0)
-				sol_[index[i]]=activeA[i][n];
-		}
-		for (i=0; i<m; i++)
-		{
-			cout<<"x"<<i+1<<" is "<<sol_[i]<<endl;
-		}
+		checkSolution=2; // Alternate Solution Exists
 		return;
 	}
 
@@ -108,7 +81,7 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 			count++;
 	}
 	if (count==m){
-		cout<<"Solution is Unbounded"<<endl;
+		checkSolution=3;   // Unboundedness
 		return;
 	}
 
@@ -156,7 +129,7 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 
 int main()
 {
-	int n, m, i, j, *sol_index, geq, leq, eq, M=1000, max_min;
+	int n, m, i, j, *sol_index, geq, leq, eq, M=1000, max_min, choice;
 	float **A, *b, **activeA, *z, temp;
 
 	cout<<"Enter No of Equations : ";
@@ -241,6 +214,44 @@ int main()
 		sol_index[i]=-1;
 
 	simplex(activeA, n+geq, m, sol_index, max_min);
+
+	cout<<"Enter your choice :"<<endl;
+	cout<<"(a) List of all BFS"<<endl;
+	cout<<"(b) Number of Iterations to solve the problem"<<endl;
+	cout<<"(c) List of all Non-basic variables along with net evaluations in ith iteration"<<endl;
+	cout<<"(d) List of Basic variables along with min ratios in ith iteration"<<endl;
+	cout<<"(e) simplex table of ith iteration"<<endl;
+	cout<<"(f) optimal solution (if exists otherwise generate report for infeasibility, unboundedness, alternative optimum etc.)"<<endl;
+	cin>>choice;
+
+	if (choice==5)
+	{
+		if (checkSolution==1)
+			cout<<"Optimal Solution is "<<endl;
+		else if (checkSolution==2)
+			cout<<"Alternate Solution Exists. One optimal Solution is :"<<endl;
+		if (checkSolution==3){
+			cout<<"Unboundedness"<<endl;
+			return 0;
+		}
+		
+		if (max_min==1)
+			cout<<activeA[m][n]<<endl;
+		if (max_min==2)
+			cout<<(-1)*activeA[m][n]<<endl;
+		
+		float *sol_;
+		sol_ = new float [m];
+		for (i=0; i<m; i++)
+		{
+			if (sol_index[i]>=0)
+				sol_[sol_index[i]]=activeA[i][n];
+		}
+		for (i=0; i<m; i++)
+		{
+			cout<<"x"<<i+1<<" is "<<sol_[i]<<endl;
+		}
+	}
 
 	return 0;
 
