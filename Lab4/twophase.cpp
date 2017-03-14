@@ -125,10 +125,14 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 	cout<<"Row Column"<<pivot_row<<"  "<<pivot_col<<endl;
 
 	index[pivot_row]=pivot_col;
+	float swap;
+	swap=activeA[m+2][pivot_col];
+	activeA[m+2][pivot_col]=activeA[pivot_row][n+1];
+	activeA[pivot_row][n+1]=swap;
 
 	//make new table
 	float pivot=activeA[pivot_row][pivot_col];
-	for (i=0; i<=m; i++)
+	for (i=0; i<=m+1; i++)
 	{
 		for(j=0; j<=n; j++)
 		{
@@ -142,15 +146,13 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 	for (i=0; i<=n; i++)
 		activeA[pivot_row][i]=activeA[pivot_row][i]/pivot;
 
-	for (i=0; i<=m; i++)
+	for (i=0; i<=m+1; i++)
 		activeA[i][pivot_col]=-activeA[i][pivot_col]/pivot;
 	activeA[pivot_row][pivot_col]=1/pivot;
 	
 	print(n+1, m+1, activeA);
 
-
 	simplex(activeA, n, m, index, max_min);
-
 }
 
 
@@ -165,7 +167,6 @@ int main()
 	cout<<"Enter No of Unknwons : ";
 	cin>>n;
 
-    // arr = new int [n];
     cout<<"Enter the number of >=, =, <= contraints : "<<endl;
     cin>>geq>>eq>>leq;
 
@@ -173,13 +174,15 @@ int main()
     	M=0;
 
     A= new float* [m]; 
-    activeA = new float* [m+1];
+    activeA = new float* [m+1+1+1];
 
     for (i=0; i<m; i++){
         A[i]= new float [n];
-        activeA[i]= new float [n+geq+1];
+        activeA[i]= new float [n+geq+1+1];
     }
     activeA[m]= new float [n+geq+1];
+    activeA[m+1]= new float [n+geq+1];
+    activeA[m+2]= new float [n+geq+1];
 
 	cout<<"Enter the matrix A in order (e.g first 1) >= 2) = 3) <= ,contraints) : \n";
 	for (i=0; i<m; i++){
@@ -197,19 +200,30 @@ int main()
 			else
 				activeA[j][n+i]=0;
 		}
-		activeA[m][n+i]=M;
 	}
 
 	cout<<"Enter the column vector 'b' : \n";
     b=new float [m];
-    temp=0;
 	for (i=0; i<m; i++){
 		cin>>b[i];
-		if (i<(geq+eq))
-			temp=temp+b[i];
 		activeA[i][n+geq]=b[i];
 	}
-	activeA[m][n+geq]= temp*M*(-1);
+
+	for (i=0; i<geq+eq; i++)
+	{
+		for (j=0; j<n+geq+1; j++)
+			activeA[m][j]-=activeA[i][j];
+	}
+
+	for (i=0; i<n+geq; i++)
+	{
+		activeA[m+2][i]=i;
+	}
+
+	for (i=0; i<m; i++)
+	{
+		activeA[i][n+geq+1]=50+i;
+	}
 
 	cout<<"Enter the choice : 1 -- Maximize, 2 -- Minimize"<<endl;
 	cin>>max_min;
@@ -218,31 +232,37 @@ int main()
 	z=new float [n];
 	for (i=0; i<n; i++){
 		cin>>z[i];
-		// activeA[m][i]=-z[i];
-		temp=0;
-		for (j=0; j<(geq+eq); j++)
-			temp=temp+A[j][i];
 		if (max_min==1)
-			activeA[m][i]=-z[i]-temp*M;
+			activeA[m+1][i]=-z[i];
 		if (max_min==2)
-			activeA[m][i]=z[i]+temp*M;
+			activeA[m+1][i]=z[i];
 	}
 
-
-
-	print(n+geq+1, m+1, activeA);
-
-	// for ()
-
-
-	// print(n+1, m+1, activeA);
 	sol_index = new int[m];
 
 	for (i=0; i<m; i++)
 		sol_index[i]=-1;
 
+	print(n+geq+1, m+1, activeA);
+	cout<<"Phase I starts"<<endl;
 	simplex(activeA, n+geq, m, sol_index, max_min);
 
+	cout<<"Phase I complete"<<endl;
+
+	for (i=0; i<=n+geq; i++)
+		activeA[m][i]=activeA[m+1][i];
+
+	for (i=0; i<n+geq; i++)
+	{
+		if (activeA[m+2][i]>=50)
+		{
+			for (j=0; j<m+2; j++)
+				activeA[j][i]=0;
+		}
+	}
+
+	simplex(activeA, n+geq, m, sol_index, max_min);
+	
 	return 0;
 
 
