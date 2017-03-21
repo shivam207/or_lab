@@ -1,10 +1,13 @@
-//				Lab3 Code
+//				Lab5 Menu Driven
 
 #include <iostream>
 #include <iomanip> 
 #include <vector>
 
 using namespace std;
+
+int iteration=0;
+int usr_iter;
 
 int min_index(float *lastrow, int length)
 {
@@ -43,11 +46,13 @@ void print(int n, int m, float **A)
 	// cout<<"----------------"<<endl;
 }
 
-void simplex(float **activeA, int n, int m, int *index, int max_min)
+void simplex(float **activeA, int n, int m, int max_min, int choice)
 {
 	float lastrow[n+1], *temp;
 	int i, j, pivot_col=0, pivot_row, count;
 	bool stop=true, unbounded=false;
+
+	iteration++;
 
 	for (i=0; i<n; i++)
 	{
@@ -57,22 +62,26 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 	}
 
 	if (stop==true){
-		if (max_min==1)
-			cout<<endl<<"Optimal Solution is "<<activeA[m][n]<<endl;
-		if (max_min==2)
-			cout<<endl<<"Optimal Solution is "<<(-1)*activeA[m][n]<<endl;
-		
-		float *sol_;
-		sol_ = new float [n];
-		for (i=0; i<m; i++)
+		if (choice==4)
 		{
-			if (index[i]>=0)
-				sol_[index[i]]=activeA[i][n];
+			if (max_min==1)
+				cout<<endl<<"Optimal Solution is "<<activeA[m][n]<<endl;
+			if (max_min==2)
+				cout<<endl<<"Optimal Solution is "<<(-1)*activeA[m][n]<<endl;
+			
+			for (i=0; i<m; i++)
+			{
+				if (activeA[i][n+1]<50)
+					cout<<"x"<<activeA[i][n+1]<<" is "<<activeA[i][n]<<endl;
+			}
+
+			for (i=0; i<n; i++)
+			{
+				if (activeA[m+1][i]<50)
+					cout<<"x"<<activeA[m+1][i]<<" is "<<0<<endl;
+			}
 		}
-		for (i=0; i<n; i++)
-		{
-			cout<<"x"<<i+1<<" is "<<sol_[i]<<endl;
-		}
+		return;
 		return;
 	}
 
@@ -81,20 +90,25 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 	//If the last element corresponding to pivot choosen pivot col is zero, Alternate solution exists.
 	if (activeA[m][pivot_col]==0)
 	{
-		if (max_min==1)
+		
+		if (choice==4)
+		{
+			if (max_min==1)
 			cout<<endl<<"Alternate Solution Exists. Optimal Solution is "<<activeA[m][n]<<endl;
-		if (max_min==2)
-			cout<<endl<<"Alternate Solution Exists. Optimal Solution is "<<(-1)*activeA[m][n]<<endl;
-		float *sol_;
-		sol_ = new float [n];
-		for (i=0; i<m; i++)
-		{
-			if (index[i]>=0)
-				sol_[index[i]]=activeA[i][n];
-		}
-		for (i=0; i<n; i++)
-		{
-			cout<<"x"<<i+1<<" is "<<sol_[i]<<endl;
+			if (max_min==2)
+				cout<<endl<<"Alternate Solution Exists. Optimal Solution is "<<(-1)*activeA[m][n]<<endl;
+			
+			for (i=0; i<m; i++)
+			{
+				if (activeA[i][n+1]<50)
+					cout<<"x"<<activeA[i][n+1]<<" is "<<activeA[i][n]<<endl;
+			}
+
+			for (i=0; i<n; i++)
+			{
+				if (activeA[m+1][i]<50)
+					cout<<"x"<<activeA[m+1][i]<<" is "<<0<<endl;
+			}
 		}
 		return;
 	}
@@ -108,7 +122,8 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 			count++;
 	}
 	if (count==m){
-		cout<<"Solution is Unbounded"<<endl;
+		if (choice==4)
+			cout<<"Solution is Unbounded"<<endl;
 		return;
 	}
 
@@ -124,7 +139,10 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 	pivot_row=min_col_index(temp, m);
 	cout<<"Row Column"<<pivot_row<<"  "<<pivot_col<<endl;
 
-	index[pivot_row]=pivot_col;
+	float swap;
+	swap=activeA[m+1][pivot_col];
+	activeA[m+1][pivot_col]=activeA[pivot_row][n+1];
+	activeA[pivot_row][n+1]=swap;
 
 	//make new table
 	float pivot=activeA[pivot_row][pivot_col];
@@ -146,10 +164,32 @@ void simplex(float **activeA, int n, int m, int *index, int max_min)
 		activeA[i][pivot_col]=-activeA[i][pivot_col]/pivot;
 	activeA[pivot_row][pivot_col]=1/pivot;
 	
-	print(n+1, m+1, activeA);
+	if (choice==3 && iteration==usr_iter)
+		print(n+1, m+1, activeA);	
 
+	if (choice==2 && iteration==usr_iter)
+	{
+		cout<<"Basic Variables are : "<<endl;
+		for (i=0; i<m; i++)
+		{
+			if (activeA[i][n+1]<50)
+				cout<<"x"<<activeA[i][n+1]<<endl;
+			else
+				cout<<"z"<<activeA[i][n+1]-50<<endl;
+		}
 
-	simplex(activeA, n, m, index, max_min);
+		cout<<"Non Basic Variables are :"<<endl;
+		for (i=0; i<n; i++)
+		{
+			if (activeA[m+1][i]<50)
+				cout<<"x"<<activeA[m+1][i]<<endl;
+			else
+				cout<<"z"<<activeA[m+1][i]-50<<endl;
+		}
+	}
+
+	print(n+2, m+2, activeA);
+	simplex(activeA, n, m, max_min, choice);
 
 }
 
@@ -239,18 +279,46 @@ int main()
 			activeA[m][i]=z[i]+temp*M;
 	}
 
-	print(n+geq+1+1, m+2, activeA);
+	// print(n+geq+1+1, m+2, activeA);
 
 	// for ()
 
 
-	// print(n+1, m+1, activeA);
-	sol_index = new int[m];
+	print(n+2, m+2, activeA);
 
-	for (i=0; i<m; i++)
-		sol_index[i]=-1;
+	float tempA[m+2][n+2];
+	for (i=0; i<m+2; i++)
+		for (j=0; j<n+2; j++)
+			tempA[i][j]=activeA[i][j];
 
-	simplex(activeA, n+geq, m, sol_index, max_min);
+	int choice;
+	do{
+	cout<<"Choose the Option:"<<endl;
+	cout<<"1) Initial Table"<<endl;
+	cout<<"2) Basic and Non-Basic at ith iteration"<<endl;
+	cout<<"3) Table at ith iteration"<<endl;
+	cout<<"4) Optimal Solution"<<endl;
+	cout<<"5) Exit"<<endl;
+	cin>>choice;
+		if (choice==1){
+			cout<<"Initial Table is :"<<endl;
+			print(n+1, m+1, activeA);
+		}
+		if (choice==3 || choice==2)
+		{
+			cout<<"Enter the iteration: ";
+			cin>>usr_iter;
+		}
+		iteration=0;
+		simplex(activeA, n+geq, m, max_min, choice);
+		for (i=0; i<m+2; i++)
+			for (j=0; j<n+2; j++)
+				activeA[i][j]=tempA[i][j];
+
+	}
+	while(choice<5);
+
+	// simplex(activeA, n+geq, m, max_min);
 
 	return 0;
 
