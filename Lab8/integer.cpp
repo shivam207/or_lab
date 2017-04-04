@@ -4,6 +4,7 @@
 #include <iomanip> 
 #include <vector>
 #include <cmath>
+#include <math.h>
 
 using namespace std;
 
@@ -76,13 +77,13 @@ void simplex(float **activeA, int n, int m, int max_min)
 
 		for (i=0; i<m; i++)
 		{
-			if (activeA[i][n+1]<50)
+			if (activeA[i][n+1]<50 && activeA[i][n+1]>0)
 				cout<<"x"<<activeA[i][n+1]<<" is "<<activeA[i][n]<<endl;
 		}
 
 		for (i=0; i<n; i++)
 		{
-			if (activeA[m+2][i]<50)
+			if (activeA[m+2][i]<50 && activeA[m+2][i]>0)
 				cout<<"x"<<activeA[m+2][i]<<" is "<<0<<endl;
 		}
 
@@ -101,13 +102,13 @@ void simplex(float **activeA, int n, int m, int max_min)
 
 		for (i=0; i<m; i++)
 		{
-			if (activeA[i][n+1]<50)
+			if (activeA[i][n+1]<50 && activeA[i][n+1]>0)
 				cout<<"x"<<activeA[i][n+1]<<" is "<<activeA[i][n]<<endl;
 		}
 
 		for (i=0; i<n; i++)
 		{
-			if (activeA[m+2][i]<50)
+			if (activeA[m+2][i]<50 && activeA[m+2][i]>0)
 				cout<<"x"<<activeA[m+2][i]<<" is "<<0<<endl;
 		}
 
@@ -137,7 +138,7 @@ void simplex(float **activeA, int n, int m, int max_min)
 			temp[i]=1000000;
 	}
 	pivot_row=min_col_index(temp, m);
-	cout<<"Row Column"<<pivot_row<<"  "<<pivot_col<<endl;
+	// cout<<"Row Column"<<pivot_row<<"  "<<pivot_col<<endl;
 
 	float swap;
 	swap=activeA[m+2][pivot_col];
@@ -164,7 +165,7 @@ void simplex(float **activeA, int n, int m, int max_min)
 		activeA[i][pivot_col]=-activeA[i][pivot_col]/pivot;
 	activeA[pivot_row][pivot_col]=1/pivot;
 	
-	print(n+1, m+1, activeA);
+	// print(n+1, m+1, activeA);
 
 	simplex(activeA, n, m, max_min);
 }
@@ -192,13 +193,13 @@ void dualsimplex(float **activeA, int n, int m, int max_min, int choice)
 			
 			for (i=0; i<m; i++)
 			{
-				if (activeA[i][n+1]<50)
+				if (activeA[i][n+1]<50 && activeA[i][n+1]>0)
 					cout<<"x"<<activeA[i][n+1]<<" is "<<activeA[i][n]<<endl;
 			}
 
 			for (i=0; i<n; i++)
 			{
-				if (activeA[m+1][i]<50)
+				if (activeA[m+1][i]<50 && activeA[m+1][i]>0)
 					cout<<"x"<<activeA[m+1][i]<<" is "<<0<<endl;
 			}
 		}
@@ -262,7 +263,7 @@ void dualsimplex(float **activeA, int n, int m, int max_min, int choice)
 	activeA[pivot_row][pivot_col]=1/pivot;
 	
 	// print(n+1, m+1, activeA);
-	print(n+2, m+3, activeA);
+	// print(n+2, m+3, activeA);
 
 	dualsimplex(activeA, n, m, max_min, choice);
 
@@ -365,7 +366,7 @@ int main()
 
 	simplex(activeA, n+geq, m, max_min);
 
-	print(n+geq+2, m+3, activeA);
+	// print(n+geq+2, m+3, activeA);
 
 	float* frac;
 	int flagchk=1;
@@ -375,7 +376,10 @@ int main()
 	do{
 		frac = new float[m];
 		for (i=0; i<m; i++){
-			frac[i]=activeA[i][n+geq]-int(activeA[i][n+geq]);
+			frac[i]=activeA[i][n+geq]-(int)(activeA[i][n+geq]);
+			if (frac[i]>0.999 || frac[i]<0.0001)
+				frac[i]=0;
+
 			if (frac[i]!=0)
 				flagchk=2;
 		}
@@ -391,11 +395,11 @@ int main()
 		{
 			temp=activeA[m][i];
 			if (activeA[sel_ind][i]<0){
-				activeA[m][i]=-1*(activeA[sel_ind][i]-(int(activeA[sel_ind][i])-1));
+				activeA[m][i]=-1*(activeA[sel_ind][i]-(int)((activeA[sel_ind][i])-1));
 				activeA[m+1][i]=temp;
 			}
 			else{
-				activeA[m][i]=-1*(activeA[sel_ind][i]-int(activeA[sel_ind][i]));
+				activeA[m][i]=-1*(activeA[sel_ind][i]-(int)(activeA[sel_ind][i]));
 				activeA[m+1][i]=temp;
 			}
 		}
@@ -407,7 +411,7 @@ int main()
 		dualsimplex(activeA, n+geq, m, max_min, 4);
 		k++;
 
-	} while(k<2);
+	} while(1);
 	return 0;
 
 }
