@@ -56,7 +56,7 @@ void print(int n, int m, float **A)
 	// cout<<"----------------"<<endl;
 }
 
-void simplex(float **activeA, int n, int m, int max_min)
+void simplex(float **activeA, int n, int m, int max_min, float *sol)
 {
 	float lastrow[n+1], *temp;
 	int i, j, pivot_col=0, pivot_row, count;
@@ -77,14 +77,18 @@ void simplex(float **activeA, int n, int m, int max_min)
 
 		for (i=0; i<m; i++)
 		{
-			if (activeA[i][n+1]<50 && activeA[i][n+1]>0)
+			if (activeA[i][n+1]<50 && activeA[i][n+1]>0){
 				cout<<"x"<<activeA[i][n+1]<<" is "<<activeA[i][n]<<endl;
+				sol[(int)(activeA[i][n+1]-1)]=activeA[i][n];
+			}
 		}
 
 		for (i=0; i<n; i++)
 		{
-			if (activeA[m+2][i]<50 && activeA[m+2][i]>0)
+			if (activeA[m+2][i]<50 && activeA[m+2][i]>0){
 				cout<<"x"<<activeA[m+2][i]<<" is "<<0<<endl;
+				sol[(int)(activeA[m+2][i]-1)]=0;
+			}
 		}
 
 		return;
@@ -167,113 +171,35 @@ void simplex(float **activeA, int n, int m, int max_min)
 	
 	// print(n+1, m+1, activeA);
 
-	simplex(activeA, n, m, max_min);
+	simplex(activeA, n, m, max_min, sol);
 }
 
-void dualsimplex(float **activeA, int n, int m, int max_min, int choice)
+float fractional (float x)
 {
-	float lastrow[n+1], *temp;
-	int i, j, pivot_col=0, pivot_row, count;
-	bool stop=true, unbounded=false;
-
-	for (i=0; i<m; i++)
-	{
-		if (activeA[i][n]<0)
-			stop=false;
-
-	}
-
-	if (stop==true){
-		if (choice==4)
-		{
-			if (max_min==1)
-				cout<<endl<<"Optimal Solution is "<<activeA[m][n]<<endl;
-			if (max_min==2)
-				cout<<endl<<"Optimal Solution is "<<(-1)*activeA[m][n]<<endl;
-			
-			for (i=0; i<m; i++)
-			{
-				if (activeA[i][n+1]<50 && activeA[i][n+1]>0)
-					cout<<"x"<<activeA[i][n+1]<<" is "<<activeA[i][n]<<endl;
-			}
-
-			for (i=0; i<n; i++)
-			{
-				if (activeA[m+1][i]<50 && activeA[m+1][i]>0)
-					cout<<"x"<<activeA[m+1][i]<<" is "<<0<<endl;
-			}
-		}
-		return;
-	}
-
-	float temp1[m];
-	for (i=0; i<m; i++)
-		temp1[i]=activeA[i][n];
-
-	pivot_row=min_index(temp1, m);
-
-	//Unboundedness Checking
-	count=0;
-	for (i=0; i<n; i++)
-	{
-		if (activeA[pivot_row][i]>=0)
-			count++;
-	}
-	if (count==n){
-		if (choice==4)
-			cout<<"Solution is Unbounded"<<endl;
-		return;
-	}
-
-	//creating temp array for choosing pivot_row
-	temp=new float [m];
-	for (i=0; i<n; i++)
-	{
-		if (activeA[pivot_row][i]<0)
-			temp[i]=abs(activeA[m][i]/activeA[pivot_row][i]);
-		else
-			temp[i]=1000000;
-	}
-	pivot_col=min_col_index(temp, n);
-	// cout<<"Row Column"<<pivot_row<<"  "<<pivot_col<<endl;
-
-	float swap;
-	swap=activeA[m+1][pivot_col];
-	activeA[m+1][pivot_col]=activeA[pivot_row][n+1];
-	activeA[pivot_row][n+1]=swap;
-
-	//make new table
-	float pivot=activeA[pivot_row][pivot_col];
-	for (i=0; i<=m; i++)
-	{
-		for(j=0; j<=n; j++)
-		{
-			if (i!= pivot_row && j!= pivot_col)
-			{
-				activeA[i][j]=(activeA[i][j]*activeA[pivot_row][pivot_col]-activeA[pivot_row][j]*activeA[i][pivot_col])/activeA[pivot_row][pivot_col];
-			}
-		}
-	}
-
-	for (i=0; i<=n; i++)
-		activeA[pivot_row][i]=activeA[pivot_row][i]/pivot;
-
-	for (i=0; i<=m; i++)
-		activeA[i][pivot_col]=-activeA[i][pivot_col]/pivot;
-	activeA[pivot_row][pivot_col]=1/pivot;
-	
-	// print(n+1, m+1, activeA);
-	// print(n+2, m+3, activeA);
-
-	dualsimplex(activeA, n, m, max_min, choice);
-
+	if (x==int(x))
+		return 0;
+	else if (x>0)
+		return x-(int)(x);
+	else
+		return x-(int)(x)+1;
 }
 
+void recurse (float *sol, int n)
+{
+	int i;
+
+	for (i=0; i<n; i++){
+		// cout<<sol[i]<<" "; 
+		// cout<<fractional(sol[i])<<" ";
+		if (fractional(sol[i])>0){
+		}
+	}
+}
 
 int main()
 {
 	int n, m, i, j, geq, leq, eq, M=1000, max_min;
-	float **A, *b, **activeA, *z, temp;
+	float **A, *b, **activeA, *z, temp, *sol;
 
 	cout<<"Enter No of Equations : ";
 	cin>>m;
@@ -291,6 +217,8 @@ int main()
         A[i]= new float [n];
         activeA[i]= new float [n+geq+1+1];
     }
+
+    sol= new float [n];
 
 	cout<<"Enter the matrix A in order (e.g first 1) >= 2) = 3) <= ,contraints) : \n";
 	for (i=0; i<m; i++){
@@ -348,7 +276,7 @@ int main()
 
 	print(n+geq+1, m+1, activeA);
 	cout<<"Phase I starts"<<endl;
-	simplex(activeA, n+geq, m, max_min);
+	simplex(activeA, n+geq, m, max_min, sol);
 
 	cout<<"Phase I complete"<<endl;
 
@@ -364,54 +292,56 @@ int main()
 		}
 	}
 
-	simplex(activeA, n+geq, m, max_min);
+	simplex(activeA, n+geq, m, max_min, sol);
+
+	recurse(sol, n);
 
 	// print(n+geq+2, m+3, activeA);
 
-	float* frac;
-	int flagchk=1;
+	// float* frac;
+	// int flagchk=1;
 
-	int k=0;
+	// int k=0;
 
-	do{
-		frac = new float[m];
-		for (i=0; i<m; i++){
-			frac[i]=activeA[i][n+geq]-(int)(activeA[i][n+geq]);
-			if (frac[i]>0.999 || frac[i]<0.0001)
-				frac[i]=0;
+	// do{
+	// 	frac = new float[m];
+	// 	for (i=0; i<m; i++){
+	// 		frac[i]=activeA[i][n+geq]-(int)(activeA[i][n+geq]);
+	// 		if (frac[i]>0.999 || frac[i]<0.0001)
+	// 			frac[i]=0;
 
-			if (frac[i]!=0)
-				flagchk=2;
-		}
+	// 		if (frac[i]!=0)
+	// 			flagchk=2;
+	// 	}
 
-		if (flagchk==1)
-			break;
+	// 	if (flagchk==1)
+	// 		break;
 
-		flagchk=1;
+	// 	flagchk=1;
 
-		int sel_ind=max_index(frac, m);
+	// 	int sel_ind=max_index(frac, m);
 
-		for (i=0; i<=(n+geq); i++)
-		{
-			temp=activeA[m][i];
-			if (activeA[sel_ind][i]<0){
-				activeA[m][i]=-1*(activeA[sel_ind][i]-(int)((activeA[sel_ind][i])-1));
-				activeA[m+1][i]=temp;
-			}
-			else{
-				activeA[m][i]=-1*(activeA[sel_ind][i]-(int)(activeA[sel_ind][i]));
-				activeA[m+1][i]=temp;
-			}
-		}
+	// 	for (i=0; i<=(n+geq); i++)
+	// 	{
+	// 		temp=activeA[m][i];
+	// 		if (activeA[sel_ind][i]<0){
+	// 			activeA[m][i]=-1*(activeA[sel_ind][i]-(int)((activeA[sel_ind][i])-1));
+	// 			activeA[m+1][i]=temp;
+	// 		}
+	// 		else{
+	// 			activeA[m][i]=-1*(activeA[sel_ind][i]-(int)(activeA[sel_ind][i]));
+	// 			activeA[m+1][i]=temp;
+	// 		}
+	// 	}
 
-		print(n+geq+2, m+3, activeA);
+	// 	print(n+geq+2, m+3, activeA);
 
-		m=m+1;
+	// 	m=m+1;
 
-		dualsimplex(activeA, n+geq, m, max_min, 4);
-		k++;
+	// 	dualsimplex(activeA, n+geq, m, max_min, 4);
+	// 	k++;
 
-	} while(1);
+	// } while(1);
 	return 0;
 
 }

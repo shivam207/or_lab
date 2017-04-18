@@ -130,9 +130,7 @@ int move(tableau **T, int direction, int x, int y, int s, int d, vector< pair < 
 	}
 	if (direction==2)
 	{
-		cout<<"Right\n";
 		if (y==d-1){
-			cout<<"D\n";
 			res=move(T, 3, x, y, s, d, loop);
 			if (res==1)
 				return 1;
@@ -142,7 +140,6 @@ int move(tableau **T, int direction, int x, int y, int s, int d, vector< pair < 
 			y++;
 			if (T[x][y].isBasic)
 			{
-				cout<<"D1\n";
 				temp.first=x;
 				temp.second=y;
 				loop.push_back(temp);
@@ -158,9 +155,7 @@ int move(tableau **T, int direction, int x, int y, int s, int d, vector< pair < 
 
 	if (direction==3)
 	{
-		cout<<"Down\n";
 		if (x==s-1){
-			cout<<"L\n";
 			res=move(T, 4, x, y, s, d, loop);
 			if (res==1)
 				return 1;
@@ -170,7 +165,6 @@ int move(tableau **T, int direction, int x, int y, int s, int d, vector< pair < 
 			x++;
 			if (T[x][y].isBasic)
 			{
-				cout<<"L1\n";
 				temp.first=x;
 				temp.second=y;
 				loop.push_back(temp);
@@ -185,7 +179,6 @@ int move(tableau **T, int direction, int x, int y, int s, int d, vector< pair < 
 
 	if (direction==4)
 	{
-		cout<<"Left\n";
 		if (y==0){
 			res=move(T, 1, x, y, s, d, loop);
 			if (res==1)
@@ -218,11 +211,11 @@ void findloop(tableau **T, int enter_x, int enter_y, int s, int d)
 	temp.second=y;
 	loop.push_back(temp);
 	move(T, 1, x, y, s, d, loop);
-	cout<<"Coordinates are :"<<endl;
-	for(int i = 0; i < loop.size();++i)
-        cout << loop[i].first << ' '<< loop[i].second<<endl;
+	// cout<<"Coordinates are :"<<endl;
+	// for(int i = 0; i < loop.size();++i)
+ //        cout << loop[i].first << ' '<< loop[i].second<<endl;
 
-    cout<<"Size is : "<<loop.size()<<endl;
+ //    cout<<"Size is : "<<loop.size()<<endl;
     //Leaving Variable
     if (T[loop[1].first][loop[1].second].value < T[loop[3].first][loop[3].second].value)
     {
@@ -239,8 +232,7 @@ void findloop(tableau **T, int enter_x, int enter_y, int s, int d)
     T[loop[2].first][loop[2].second].value=T[leave_x][leave_y].value+T[loop[2].first][loop[2].second].value;
     T[leave_x][leave_y].isBasic=0;
     T[x][y].value=T[leave_x][leave_y].value;
-    T[leave_x][leave_y].value=0;
- 	printT(s+2, d+2, T);	   
+    T[leave_x][leave_y].value=0;   
 }
 
 void iterateop(tableau **T, float **cost, int s, int d)
@@ -261,7 +253,6 @@ void iterateop(tableau **T, float **cost, int s, int d)
 			{
 				if (T[i][j].isBasic == 1)
 				{
-					cout<<i<<" -- "<<j<<endl;
 					if (T[i][d+1].value==-1111 && T[s+1][j].value==-1111)
 						flag=1;
 					else if (T[i][d+1].value==-1111)
@@ -296,10 +287,15 @@ void iterateop(tableau **T, float **cost, int s, int d)
 	{
 		cout<<"========FINAL SOL========="<<endl;
 		solution(T, cost, s, d);
+		for (i=0; i<s; i++)
+			for (j=0; j<d; j++)
+				if (T[i][j].isBasic != 1)
+					T[i][j].value=0;
+		cout<<"Transportation Tableau is : \n";
+		printT(s, d, T);
 		return;
 	}
 	cout<<"entering var : X"<<enter_var_x+1<<enter_var_y+1<<endl;
-	printT(s+2, d+2, T);
 	T[enter_var_x][enter_var_y].isBasic=1;
 	findloop(T, enter_var_x, enter_var_y, s, d);
 	solution(T, cost, s, d);
